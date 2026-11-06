@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudentOS — Student Productivity Platform</title>
+    <meta name="description" content="An all-in-one productivity platform designed to help students manage academic life, organize assignments, track tasks, create notes, manage schedules, and monitor productivity." />
+    <meta property="og:title" content="StudentOS — Student Productivity Platform" />
+    <meta property="og:description" content="An all-in-one productivity platform designed to help students manage academic life, organize assignments, track tasks, create notes, manage schedules, and monitor productivity." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/responsive.css" />
+
+    <!-- Libraries (Chart.js & Lucide Icons) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body>
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <div class="app-container">
+      <!-- ================= Left Sidebar ================= -->
+      <aside class="app-sidebar" id="app-sidebar">
+        <div class="sidebar-header">
+          <a href="#" class="brand-logo" onclick="window.switchView('overview'); return false;">
+            <div class="brand-icon-wrapper">
+              <i data-lucide="graduation-cap" style="width: 22px; height: 22px;"></i>
+            </div>
+            <div class="brand-text">
+              <span>StudentOS</span>
+              <span class="brand-version">Pro Academic OS</span>
+            </div>
+          </a>
+          <button class="btn-icon" id="btn-collapse-sidebar" title="Toggle Sidebar Width">
+            <i data-lucide="panel-left-close" style="width: 18px; height: 18px;"></i>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <a href="#overview" class="nav-item active" data-view="overview">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Overview</span>
+          </a>
+          <a href="#tasks" class="nav-item" data-view="tasks">
+            <i data-lucide="check-square"></i>
+            <span>My Tasks</span>
+            <span class="nav-badge" id="sidebar-task-badge">0</span>
+          </a>
+          <a href="#assignments" class="nav-item" data-view="assignments">
+            <i data-lucide="book-open"></i>
+            <span>Assignments</span>
+            <span class="nav-badge" id="sidebar-assignment-badge">0</span>
+          </a>
+          <a href="#calendar" class="nav-item" data-view="calendar">
+            <i data-lucide="calendar"></i>
+            <span>Calendar</span>
+          </a>
+          <a href="#timetable" class="nav-item" data-view="timetable">
+            <i data-lucide="clock"></i>
+            <span>Timetable</span>
+          </a>
+          <a href="#notes" class="nav-item" data-view="notes">
+            <i data-lucide="file-text"></i>
+            <span>Notes</span>
+          </a>
+          <a href="#timer" class="nav-item" data-view="timer">
+            <i data-lucide="timer"></i>
+            <span>Focus Timer</span>
+          </a>
+          <a href="#analytics" class="nav-item" data-view="analytics">
+            <i data-lucide="bar-chart-2"></i>
+            <span>Analytics</span>
+          </a>
+          <a href="#settings" class="nav-item" data-view="settings">
+            <i data-lucide="settings"></i>
+            <span>Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="streak-card">
+            <div class="streak-icon">🔥</div>
+            <div class="streak-info">
+              <h4>5-Day Study Streak</h4>
+              <p>Top 5% of productive students</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ================= Main Content ================= -->
+      <main class="app-main">
+        <!-- Top Navigation Bar -->
+        <header class="app-header">
+          <div class="header-left">
+            <button class="btn-icon" id="btn-mobile-menu" aria-label="Open Navigation Menu" style="display: none;">
+              <i data-lucide="menu"></i>
+            </button>
+            <div class="page-breadcrumb">
+              <span>StudentOS</span>
+              <span>/</span>
+              <span id="header-breadcrumb-page" class="text-accent" style="font-weight: 600;">Overview</span>
+            </div>
+          </div>
+
+          <div class="header-search" id="btn-global-search">
+            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+            <span>Search tasks, notes, classes...</span>
+            <span class="search-shortcut">⌘K</span>
+          </div>
+
+          <div class="header-right">
+            <div class="header-date">
+              <i data-lucide="calendar" style="width: 15px; height: 15px; color: var(--accent-primary);"></i>
+              <span id="header-current-date">Today</span>
+            </div>
+
+            <!-- Notifications Bell -->
+            <div class="notification-container">
+              <button class="btn-icon" id="btn-notifications" aria-label="Notifications">
+                <i data-lucide="bell" style="width: 18px; height: 18px;"></i>
+                <span class="notification-badge"></span>
+              </button>
+              <div class="notification-dropdown" id="notifications-dropdown">
+                <div class="notification-dropdown-header">
+                  <span>Urgent Deadlines & Alerts</span>
+                  <span class="badge badge-high" style="font-size: 10px;">Live</span>
+                </div>
+                <div class="notification-dropdown-list" id="notifications-list"></div>
+              </div>
+            </div>
+
+            <!-- Profile Menu -->
+            <div class="profile-container">
+              <div class="profile-btn" id="btn-profile-dropdown">
+                <div class="profile-avatar" id="header-profile-avatar">🧑‍💻</div>
+                <div class="profile-info">
+                  <span class="profile-name" id="header-profile-name">Alex Rivera</span>
+                  <span class="profile-role" id="header-profile-role">Computer Science</span>
+                </div>
+                <i data-lucide="chevron-down" style="width: 14px; height: 14px; color: var(--text-dim);"></i>
+              </div>
+              <div class="profile-dropdown" id="profile-dropdown-menu">
+                <div class="dropdown-item" onclick="window.switchView('settings')">
+                  <i data-lucide="user" style="width: 15px; height: 15px;"></i>
+                  <span>Profile & Account</span>
+                </div>
+                <div class="dropdown-item" onclick="window.switchView('analytics')">
+                  <i data-lucide="activity" style="width: 15px; height: 15px;"></i>
+                  <span>Study Velocity</span>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="dropdown-item" onclick="window.switchView('settings')">
+                  <i data-lucide="sliders" style="width: 15px; height: 15px;"></i>
+                  <span>Preferences</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- ================= PAGE VIEWS ================= -->
+
+        <!-- 1. DASHBOARD / OVERVIEW VIEW -->
+        <section class="page-view active" id="view-overview">
+          <div class="greeting-banner">
+            <div class="greeting-text">
+              <h1 id="dash-greeting-text">Welcome back, Alex! 👋</h1>
+              <p class="greeting-quote" id="dash-quote-text">"Success is the sum of small efforts repeated day in and day out." — Robert Collier</p>
+            </div>
+            <div class="greeting-meta">
+              <div class="quick-stats-pill">
+                <i data-lucide="calendar" style="width: 14px; height: 14px; color: var(--accent-primary);"></i>
+                <span id="dash-date-badge">Today</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions Bar -->
+          <div class="quick-actions-bar">
+            <button class="quick-action-btn" id="dash-quick-task">
+              <i data-lucide="plus-circle" style="color: var(--accent-primary);"></i>
+              <span>Add Task</span>
+            </button>
+            <button class="quick-action-btn" id="dash-quick-assignment">
+              <i data-lucide="file-plus" style="color: var(--accent-secondary);"></i>
+              <span>Add Assignment</span>
+            </button>
+            <button class="quick-action-btn" id="dash-quick-note">
+              <i data-lucide="edit-3" style="color: var(--accent-cyan);"></i>
+              <span>Create Note</span>
+            </button>
+            <button class="quick-action-btn" id="dash-quick-timer">
+              <i data-lucide="play" style="color: var(--accent-emerald);"></i>
+              <span>Start Focus Session</span>
+            </button>
+          </div>
+
+          <!-- Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-title">Total Tasks</span>
+                <div class="metric-icon" style="background: rgba(99, 102, 241, 0.15); color: var(--accent-primary);">
+                  <i data-lucide="check-square" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-total-tasks">0</span>
+              </div>
+              <div class="metric-progress-bar">
+                <div class="metric-progress-fill" id="dash-task-progress-fill" style="width: 0%; background: var(--accent-primary);"></div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-title">Completed Tasks</span>
+                <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">
+                  <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-completed-tasks">0</span>
+              </div>
+              <span class="metric-sub">Completion Progress</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-title">Pending Coursework</span>
+                <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">
+                  <i data-lucide="book-open" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-pending-assignments">0</span>
+              </div>
+              <span class="metric-sub">Active assignments</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-title">Upcoming (48h)</span>
+                <div class="metric-icon" style="background: rgba(244, 63, 94, 0.15); color: var(--accent-rose);">
+                  <i data-lucide="alert-circle" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-upcoming-deadlines">0</span>
+              </div>
+              <span class="metric-sub">Deadlines approaching</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-title">Productivity Score</span>
+                <div class="metric-icon" style="background: rgba(139, 92, 246, 0.15); color: var(--accent-secondary);">
+                  <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-productivity-score">85%</span>
+              </div>
+              <span class="metric-sub">Weekly performance index</span>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-card-top">
+                <span class="metric-title">Study Logged</span>
+                <div class="metric-icon" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan);">
+                  <i data-lucide="clock" style="width: 18px; height: 18px;"></i>
+                </div>
+              </div>
+              <div class="metric-value-row">
+                <span class="metric-value" id="metric-focus-hours">0h</span>
+              </div>
+              <span class="metric-sub">Total focus time recorded</span>
+            </div>
+          </div>
+
+          <!-- Charts Row -->
+          <div class="dashboard-grid-2col">
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="trending-up" style="color: var(--accent-primary);"></i> Weekly Productivity Trajectory</h3>
+                <span class="badge badge-category">Mon - Sun</span>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-weekly-productivity"></canvas>
+              </div>
+            </div>
+
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="pie-chart" style="color: var(--accent-secondary);"></i> Task Completion</h3>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-task-distribution"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Lists 3-Column Grid -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+            <!-- Priority Tasks -->
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="list-checks" style="color: var(--accent-primary);"></i> Priority Tasks Today</h3>
+                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="window.switchView('tasks')">View All</button>
+              </div>
+              <div class="dashboard-list" id="dash-priority-tasks-list"></div>
+            </div>
+
+            <!-- Deadlines -->
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="clock" style="color: var(--accent-amber);"></i> Upcoming Deadlines</h3>
+                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="window.switchView('assignments')">View All</button>
+              </div>
+              <div class="dashboard-list" id="dash-deadlines-list"></div>
+            </div>
+
+            <!-- Today's Schedule -->
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="calendar" style="color: var(--accent-cyan);"></i> Today's Timetable</h3>
+                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11.5px;" onclick="window.switchView('timetable')">View Week</button>
+              </div>
+              <div class="dashboard-list" id="dash-classes-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. MY TASKS VIEW -->
+        <section class="page-view" id="view-tasks">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>My Tasks</h2>
+              <p>Keep track of academic assignments, daily studies, and administrative to-dos.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" id="btn-add-task">
+                <i data-lucide="plus"></i>
+                <span>Add Task</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-tabs">
+              <div class="filter-tab task-filter-tab active" data-filter="all">All Tasks</div>
+              <div class="filter-tab task-filter-tab" data-filter="pending">Pending</div>
+              <div class="filter-tab task-filter-tab" data-filter="completed">Completed</div>
+              <div class="filter-tab task-filter-tab" data-filter="overdue">Overdue</div>
+            </div>
+
+            <div class="filter-controls">
+              <input type="text" id="task-search-input" placeholder="Search tasks..." />
+              <select id="task-category-select">
+                <option value="all">All Categories</option>
+                <option value="Homework">Homework</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Project">Project</option>
+                <option value="Reading">Reading</option>
+                <option value="General">General</option>
+              </select>
+              <select id="task-priority-select">
+                <option value="all">All Priorities</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+              <select id="task-sort-select">
+                <option value="dueDate">Sort by Due Date</option>
+                <option value="priority">Sort by Priority</option>
+                <option value="title">Sort by Title</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tasks-container" id="tasks-list-container"></div>
+        </section>
+
+        <!-- 3. ASSIGNMENTS VIEW -->
+        <section class="page-view" id="view-assignments">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Coursework & Assignments</h2>
+              <p>Monitor submission deadlines, course weightage, and completion statuses.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" id="btn-add-assignment">
+                <i data-lucide="plus"></i>
+                <span>Add Assignment</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-tabs">
+              <div class="filter-tab assignment-tab active" data-filter="all">All Coursework</div>
+              <div class="filter-tab assignment-tab" data-filter="upcoming">Upcoming</div>
+              <div class="filter-tab assignment-tab" data-filter="completed">Completed</div>
+              <div class="filter-tab assignment-tab" data-filter="overdue">Overdue</div>
+            </div>
+
+            <div class="filter-controls">
+              <input type="text" id="assignment-search-input" placeholder="Search assignment title..." />
+              <select id="assignment-subject-select">
+                <option value="all">All Subjects</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="assignments-grid" id="assignments-grid-container"></div>
+        </section>
+
+        <!-- 4. CALENDAR VIEW -->
+        <section class="page-view" id="view-calendar">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Academic Calendar</h2>
+              <p>Monthly overview of assignment deadlines, exams, and scheduled campus events.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" id="btn-add-calendar-event">
+                <i data-lucide="calendar-plus"></i>
+                <span>Schedule Event</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="calendar-wrapper">
+            <div class="calendar-controls">
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="btn-icon" id="cal-prev-month" title="Previous Month">
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <h3 class="calendar-month-title" id="calendar-month-heading">November 2026</h3>
+                <button class="btn-icon" id="cal-next-month" title="Next Month">
+                  <i data-lucide="chevron-right"></i>
+                </button>
+              </div>
+              <button class="btn btn-secondary" id="cal-today-btn">Today</button>
+            </div>
+
+            <!-- Calendar Days Header -->
+            <div class="calendar-grid" style="margin-bottom: 8px;">
+              <div class="calendar-day-header">Sun</div>
+              <div class="calendar-day-header">Mon</div>
+              <div class="calendar-day-header">Tue</div>
+              <div class="calendar-day-header">Wed</div>
+              <div class="calendar-day-header">Thu</div>
+              <div class="calendar-day-header">Fri</div>
+              <div class="calendar-day-header">Sat</div>
+            </div>
+
+            <!-- Calendar Month Cells -->
+            <div class="calendar-grid" id="calendar-grid-cells"></div>
+          </div>
+        </section>
+
+        <!-- 5. TIMETABLE VIEW -->
+        <section class="page-view" id="view-timetable">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Weekly Timetable</h2>
+              <p>Weekly lecture timetable, lab sessions, and classroom locations.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" id="btn-add-class">
+                <i data-lucide="plus"></i>
+                <span>Add Class</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="timetable-wrapper">
+            <div class="timetable-grid" id="timetable-days-grid"></div>
+          </div>
+        </section>
+
+        <!-- 6. NOTES VIEW -->
+        <section class="page-view" id="view-notes">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Notes & Resources</h2>
+              <p>Capture lecture insights, formulas, project ideas, and revision guides.</p>
+            </div>
+            <div class="view-header-actions">
+              <button class="btn btn-primary" id="btn-add-note">
+                <i data-lucide="plus"></i>
+                <span>Create Note</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-bar">
+            <div class="filter-tabs">
+              <div class="filter-tab note-filter-tab active" data-category="all">All Notes</div>
+              <div class="filter-tab note-filter-tab" data-category="Study Guide">Study Guides</div>
+              <div class="filter-tab note-filter-tab" data-category="Exam Prep">Exam Prep</div>
+              <div class="filter-tab note-filter-tab" data-category="Lecture Notes">Lectures</div>
+              <div class="filter-tab note-filter-tab" data-category="Ideas">Ideas</div>
+            </div>
+
+            <div class="filter-controls">
+              <input type="text" id="note-search-input" placeholder="Search notes content..." />
+            </div>
+          </div>
+
+          <div class="notes-grid" id="notes-grid-container"></div>
+        </section>
+
+        <!-- 7. FOCUS TIMER VIEW -->
+        <section class="page-view" id="view-timer">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Pomodoro Focus Timer</h2>
+              <p>Boost deep study retention with timed focus intervals and restorative breaks.</p>
+            </div>
+            <div class="view-header-actions">
+              <select id="timer-subject-select" style="width: auto;">
+                <option value="Computer Science">Subject: Computer Science</option>
+                <option value="Mathematics">Subject: Mathematics</option>
+                <option value="Physics">Subject: Physics</option>
+                <option value="Economics">Subject: Economics</option>
+                <option value="General Study">Subject: General Study</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="timer-container">
+            <div class="timer-modes">
+              <button class="timer-mode-btn active" data-mode="focus">Focus (25m)</button>
+              <button class="timer-mode-btn" data-mode="shortBreak">Short Break (5m)</button>
+              <button class="timer-mode-btn" data-mode="longBreak">Long Break (15m)</button>
+            </div>
+
+            <div class="timer-clock-display">
+              <div class="timer-time-text" id="timer-time-display">25:00</div>
+              <div class="timer-session-label" id="timer-session-label">Deep Study Session</div>
+            </div>
+
+            <div class="timer-controls">
+              <button class="btn btn-primary btn-timer-primary" id="timer-toggle-btn">
+                <i data-lucide="play"></i> Start
+              </button>
+              <button class="btn btn-secondary btn-icon" id="timer-reset-btn" style="width: 48px; height: 48px; border-radius: var(--radius-full);" title="Reset Timer">
+                <i data-lucide="rotate-ccw"></i>
+              </button>
+            </div>
+
+            <div class="timer-stats-card">
+              <div>
+                <div class="timer-stat-num" id="timer-stat-sessions">0</div>
+                <div class="timer-stat-label">Sessions Today</div>
+              </div>
+              <div>
+                <div class="timer-stat-num" id="timer-stat-today-hours">0h</div>
+                <div class="timer-stat-label">Focus Logged</div>
+              </div>
+              <div>
+                <div class="timer-stat-num" id="timer-stat-streak">5 Days</div>
+                <div class="timer-stat-label">Current Streak</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. ANALYTICS VIEW -->
+        <section class="page-view" id="view-analytics">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Productivity Analytics</h2>
+              <p>Data-driven insights into your study habits, velocity, and completion rates.</p>
+            </div>
+          </div>
+
+          <div class="analytics-grid-top">
+            <div class="metric-card">
+              <span class="metric-title">Total Hours Logged</span>
+              <div class="metric-value-row">
+                <span class="metric-value" id="analytics-total-hours">0h</span>
+              </div>
+              <span class="metric-sub">Across all subjects</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title">Productivity Score</span>
+              <div class="metric-value-row">
+                <span class="metric-value" id="analytics-productivity-score">85%</span>
+              </div>
+              <span class="metric-sub">Calculated performance score</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title">Task Completion</span>
+              <div class="metric-value-row">
+                <span class="metric-value" id="analytics-task-rate">0%</span>
+              </div>
+              <span class="metric-sub">Overall completed tasks</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title">Assignment Rate</span>
+              <div class="metric-value-row">
+                <span class="metric-value" id="analytics-assignment-rate">0%</span>
+              </div>
+              <span class="metric-sub">Coursework submitted</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-title">Completed Focus Blocks</span>
+              <div class="metric-value-row">
+                <span class="metric-value" id="analytics-focus-sessions">0</span>
+              </div>
+              <span class="metric-sub">Total pomodoro sessions</span>
+            </div>
+          </div>
+
+          <div class="analytics-charts-grid">
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="bar-chart" style="color: var(--accent-primary);"></i> Weekly Study Activity (Hours vs Target)</h3>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-analytics-weekly"></canvas>
+              </div>
+            </div>
+
+            <div class="card-widget">
+              <div class="card-widget-header">
+                <h3><i data-lucide="pie-chart" style="color: var(--accent-secondary);"></i> Study Time Distribution by Subject</h3>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-analytics-subjects"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-widget">
+            <div class="card-widget-header">
+              <h3><i data-lucide="activity" style="color: var(--accent-emerald);"></i> Task Completion Velocity (Past 7 Days)</h3>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="chart-analytics-velocity"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. SETTINGS VIEW -->
+        <section class="page-view" id="view-settings">
+          <div class="view-header">
+            <div class="view-header-title">
+              <h2>Settings & Preferences</h2>
+              <p>Configure theme appearance, student profile, focus durations, and manage data.</p>
+            </div>
+          </div>
+
+          <div class="settings-container">
+            <!-- Theme Appearance -->
+            <div class="settings-card">
+              <h3><i data-lucide="sun-moon" style="color: var(--accent-primary);"></i> Appearance & Theme</h3>
+              <div class="theme-options-grid">
+                <div class="theme-card-option active" id="theme-card-dark">
+                  <div class="theme-preview-dot theme-preview-dark"></div>
+                  <div>
+                    <strong style="display: block; font-size: 14px;">Midnight Dark (Default)</strong>
+                    <span style="font-size: 12px; color: var(--text-muted);">Deep charcoal and neon indigo contrast</span>
+                  </div>
+                </div>
+                <div class="theme-card-option" id="theme-card-light">
+                  <div class="theme-preview-dot theme-preview-light"></div>
+                  <div>
+                    <strong style="display: block; font-size: 14px;">Crisp Light</strong>
+                    <span style="font-size: 12px; color: var(--text-muted);">Clean daylight slate with soft indigo accents</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="settings-card">
+              <h3><i data-lucide="user" style="color: var(--accent-secondary);"></i> Student Profile</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="setting-profile-name">Student Full Name</label>
+                  <input type="text" id="setting-profile-name" value="Alex Rivera" />
+                </div>
+                <div class="form-group">
+                  <label for="setting-profile-major">Major & Degree</label>
+                  <input type="text" id="setting-profile-major" value="Computer Science & Engineering" />
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-primary" id="btn-save-profile">Save Profile Changes</button>
+              </div>
+            </div>
+
+            <!-- Focus Timer Preferences -->
+            <div class="settings-card">
+              <h3><i data-lucide="timer" style="color: var(--accent-amber);"></i> Focus Timer Defaults</h3>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div class="form-group">
+                  <label for="setting-focus-minutes">Focus Session (min)</label>
+                  <input type="number" id="setting-focus-minutes" min="5" max="90" value="25" />
+                </div>
+                <div class="form-group">
+                  <label for="setting-short-break">Short Break (min)</label>
+                  <input type="number" id="setting-short-break" min="1" max="30" value="5" />
+                </div>
+                <div class="form-group">
+                  <label for="setting-long-break">Long Break (min)</label>
+                  <input type="number" id="setting-long-break" min="5" max="60" value="15" />
+                </div>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <button class="btn btn-primary" id="btn-save-timer-settings">Update Timer Durations</button>
+              </div>
+            </div>
+
+            <!-- Notification & Audio Preferences -->
+            <div class="settings-card">
+              <h3><i data-lucide="bell" style="color: var(--accent-cyan);"></i> Alerts & Audio</h3>
+              <div class="toggle-setting-row">
+                <div>
+                  <strong style="display: block;">Urgent Deadline Alerts</strong>
+                  <span style="font-size: 12px; color: var(--text-muted);">Notify when assignments are due within 24 hours</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="setting-notifications-toggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-setting-row">
+                <div>
+                  <strong style="display: block;">Timer Completion Chime</strong>
+                  <span style="font-size: 12px; color: var(--text-muted);">Play audio chime when focus session finishes</span>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="setting-sound-toggle" checked />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Data Management & Backups -->
+            <div class="settings-card">
+              <h3><i data-lucide="database" style="color: var(--accent-rose);"></i> Data Management & Backups</h3>
+              <p style="font-size: 13px; color: var(--text-muted);">Export all your tasks, notes, assignments, and study statistics as a JSON file, or restore from a backup.</p>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-secondary" id="btn-export-data">
+                  <i data-lucide="download"></i>
+                  <span>Export Backup (.JSON)</span>
+                </button>
+                <label class="btn btn-secondary" style="cursor: pointer;">
+                  <i data-lucide="upload"></i>
+                  <span>Import Backup (.JSON)</span>
+                  <input type="file" id="import-file-input" accept=".json" style="display: none;" />
+                </label>
+                <button class="btn btn-danger" id="btn-reset-data" style="margin-left: auto;">
+                  <i data-lucide="refresh-cw"></i>
+                  <span>Reset to Demo Data</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Task Modal -->
+    <div class="modal-overlay" id="task-modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title" id="task-modal-title">Add New Task</div>
+          <button class="btn-icon modal-close-btn" aria-label="Close modal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="task-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="task-input-title">Task Title *</label>
+              <input type="text" id="task-input-title" placeholder="e.g. Finish Calculus Problem Set #4" required />
+            </div>
+            <div class="form-group">
+              <label for="task-input-desc">Description (Optional)</label>
+              <textarea id="task-input-desc" rows="3" placeholder="Additional details or reference links..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="task-input-priority">Priority</label>
+                <select id="task-input-priority">
+                  <option value="Low">Low</option>
+                  <option value="Medium" selected>Medium</option>
+                  <option value="High">High</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="task-input-duedate">Due Date</label>
+                <input type="date" id="task-input-duedate" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="task-input-category">Category</label>
+              <select id="task-input-category">
+                <option value="Homework">Homework</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Project">Project</option>
+                <option value="Reading">Reading</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Task</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Assignment Modal -->
+    <div class="modal-overlay" id="assignment-modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title" id="assignment-modal-title">Add New Assignment</div>
+          <button class="btn-icon modal-close-btn" aria-label="Close modal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="assignment-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="assign-input-title">Assignment Title *</label>
+              <input type="text" id="assign-input-title" placeholder="e.g. Distributed Consensus Engine" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="assign-input-subject">Course / Subject *</label>
+                <input type="text" id="assign-input-subject" placeholder="e.g. Computer Science" required />
+              </div>
+              <div class="form-group">
+                <label for="assign-input-weight">Grade Weight (e.g. 20%)</label>
+                <input type="text" id="assign-input-weight" placeholder="e.g. 25%" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="assign-input-desc">Instructions & Details</label>
+              <textarea id="assign-input-desc" rows="3" placeholder="Submission criteria and links..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="assign-input-duedate">Due Date *</label>
+                <input type="date" id="assign-input-duedate" required />
+              </div>
+              <div class="form-group">
+                <label for="assign-input-priority">Priority</label>
+                <select id="assign-input-priority">
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High" selected>High</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="assign-input-status">Status</label>
+              <select id="assign-input-status">
+                <option value="Not Started" selected>Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Assignment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Calendar Event Modal -->
+    <div class="modal-overlay" id="calendar-event-modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Schedule Calendar Event</div>
+          <button class="btn-icon modal-close-btn" aria-label="Close modal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="calendar-event-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="event-input-title">Event Title *</label>
+              <input type="text" id="event-input-title" placeholder="e.g. Calculus Midterm Review" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="event-input-date">Date *</label>
+                <input type="date" id="event-input-date" required />
+              </div>
+              <div class="form-group">
+                <label for="event-input-time">Time</label>
+                <input type="time" id="event-input-time" value="14:00" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="event-input-type">Event Type</label>
+              <select id="event-input-type">
+                <option value="Study Session">Study Session</option>
+                <option value="Office Hours">Office Hours</option>
+                <option value="Exam">Exam</option>
+                <option value="Extracurricular">Extracurricular</option>
+                <option value="Event">Event</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="event-input-notes">Notes or Location</label>
+              <input type="text" id="event-input-notes" placeholder="e.g. Library Study Room 4B" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save Event</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Day Schedule Inspection Modal -->
+    <div class="modal-overlay" id="day-schedule-modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title" id="day-schedule-date-title">Day Schedule</div>
+          <button class="btn-icon modal-close-btn" aria-label="Close modal"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body" id="day-schedule-content"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary modal-close-btn">Close</button>
+          <button type="button" class="btn btn-primary" id="day-schedule-add-btn">+ Add Event on this Date</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timetable Class Modal -->
+    <div class="modal-overlay" id="class-modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">Add Class to Timetable</div>
+          <button class="btn-icon modal-close-btn" aria-label="Close modal"><i data-lucide="x"></i></button>
+        </div>
+        <form id="class-form">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="class-input-subject">Subject / Course Title *</label>
+              <input type="text" id="class-input-subject" placeholder="e.g. Distributed Systems" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="class-input-day">Day of Week</label>
+                <select id="class-input-day">
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                  <option value="Sunday">Sunday</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="class-input-color">Color Tag</label>
+                <select id="class-input-color">
+                  <option value="indigo">Indigo</option>
+                  <option value="purple">Purple</option>
+                  <option value="teal">Teal</option>
+                  <option value="rose">Rose</option>
+                  <option value="amber">Amber</option>
+                  <option value="slate">Slate</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="class-input-start">Start Time *</label>
+                <input type="time" id="class-input-start" value="10:00" required />
+              </div>
+              <div class="form-group">
+                <label for="class-input-end">End Time *</label>
+                <input type="time" id="class-input-end" value="11:30" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="class-input-location">Location / Classroom</label>
+                <input type="text" id="class-input-location" placeholder="e.g. Turing Hall 204" />
+              </div>
+              <div class="form-group">
+                <label for="class-input-instructor">Professor / TA</label>
+                <input type="text" id="class-input-instructor" placeholder="e.g. Prof. Alan Turing" />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close-btn">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save to Timetable</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Note Editor Modal -->
+    <div class="modal-overlay" id="note-editor-modal">
+      <div class="modal-box" style="max-width: 680px;">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="file-edit" style="color: var(--accent-primary);"></i>
+            <span style="font-weight: 600;">Note Editor</span>
+            <span id="editor-autosave-indicator" style="font-size: 11px; color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: var(--radius-full);">Saved</span>
+          </div>
+          <button class="btn-icon" onclick="window.closeNoteEditor()" aria-label="Close modal"><i data-lucide="x"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" id="editor-note-title" placeholder="Note Title..." style="font-size: 18px; font-weight: 700; padding: 12px 14px;" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editor-note-category">Category</label>
+              <select id="editor-note-category">
+                <option value="Study Guide">Study Guide</option>
+                <option value="Exam Prep">Exam Prep</option>
+                <option value="Lecture Notes">Lecture Notes</option>
+                <option value="Ideas">Ideas</option>
+                <option value="General">General</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editor-note-color">Accent Color</label>
+              <select id="editor-note-color">
+                <option value="indigo">Indigo</option>
+                <option value="purple">Purple</option>
+                <option value="teal">Teal</option>
+                <option value="rose">Rose</option>
+                <option value="amber">Amber</option>
+                <option value="slate">Slate</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editor-note-content">Note Content (Autosaved)</label>
+            <textarea id="editor-note-content" rows="10" placeholder="Type formulas, markdown notes, code snippets, or thoughts here..." style="font-family: inherit; line-height: 1.6;"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="window.closeNoteEditor()">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Command Palette (Ctrl+K) -->
+    <div class="modal-overlay" id="search-modal">
+      <div class="modal-box command-palette">
+        <div class="search-input-wrapper">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="global-search-input" placeholder="Type a command, search tasks, coursework, notes..." autofocus />
+        </div>
+        <div style="padding: 12px 16px;">
+          <div class="search-results-list" id="global-search-results"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+
+    <!-- Main Module Script -->
+    <script type="module" src="/js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "name": "StudentOS — Student Productivity Platform",
+  "description": "An all-in-one productivity platform designed to help students manage academic life, organize assignments, track tasks, create notes, manage schedules, and monitor productivity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
